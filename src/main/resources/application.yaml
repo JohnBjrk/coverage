@@ -1,25 +1,6 @@
-security:
-  oauth2:
-    client:
-      clientId: 2ecf6a5fa90b4d3bb8e0c788f6851617
-      clientSecret: b720e2d905f7443ea1a1f65675a5b85e
-      accessTokenUri: https://accounts.spotify.com/api/token
-      userAuthorizationUri: https://accounts.spotify.com/authorize
-      tokenName: oauth_token
-      #authenticationScheme: query
-      clientAuthenticationScheme: form
-      scope:
-        - user-read-private
-        - user-read-email
-        #- user-modify-playback-state
-        - user-read-currently-playing
-        - user-read-playback-state
-    resource:
-      userInfoUri: https://api.spotify.com/v1/me
-
 spring:
-  jpa:
-    database: H2
+  #jpa:
+    #database: H2
     #properties:
       #hibernate.dialect: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
