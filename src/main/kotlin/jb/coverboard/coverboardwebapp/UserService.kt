@@ -26,7 +26,7 @@ class UserService(val userRepository: UserRepository) {
             val updatedUser = byUserId.copy(accessToken = token, refreshToken = refreshToken)
             userRepository.save(updatedUser)
         } else {
-            val newUser = RegisteredUser(0, user, token, refreshToken)
+            val newUser = RegisteredUser(id = null, userId = user, accessToken = token, refreshToken = refreshToken)
             userRepository.save(newUser)
         }
     }

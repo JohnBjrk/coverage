@@ -6,7 +6,7 @@ import javax.persistence.*
 data class RegisteredUser(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Int,
+    val id: Int?,
 
     @Column(unique = true)
     val userId: String,
