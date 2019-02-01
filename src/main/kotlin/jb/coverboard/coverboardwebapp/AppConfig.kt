@@ -5,7 +5,6 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.scheduling.annotation.EnableScheduling
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder
-import org.springframework.security.config.annotation.web.WebSecurityConfigurer
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
@@ -15,10 +14,10 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry
 
 @Configuration
 @EnableScheduling
-class Intercept(val authInterceptor: AuthInterceptor, val customAuthProvider: CustomAuthProvider): WebMvcConfigurer, WebSecurityConfigurerAdapter() {
+class AppConfig(val requestLogger: RequestLogger, val customAuthProvider: CustomAuthProvider): WebMvcConfigurer, WebSecurityConfigurerAdapter() {
 
     override fun addInterceptors(registry: InterceptorRegistry) {
-        registry.addInterceptor(authInterceptor)
+        registry.addInterceptor(requestLogger)
     }
 
     override fun addCorsMappings(registry: CorsRegistry) {

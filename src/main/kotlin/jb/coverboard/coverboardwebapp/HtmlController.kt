@@ -9,12 +9,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RestController
-import java.security.Principal
-import org.springframework.security.oauth2.provider.OAuth2Authentication
-import org.springframework.security.oauth2.provider.authentication.OAuth2AuthenticationDetails
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY
 import org.springframework.stereotype.Component
-import org.springframework.util.ErrorHandler
 import org.springframework.web.client.RestTemplate
 import org.springframework.util.LinkedMultiValueMap
 import org.springframework.util.MultiValueMap
@@ -23,12 +19,13 @@ import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.client.HttpClientErrorException
 import org.springframework.web.servlet.mvc.support.RedirectAttributes
 import org.springframework.web.servlet.view.RedirectView
+import java.util.*
 import javax.servlet.http.HttpServletRequest
 
 
 @Component
 @RestController
-class HtmlController(val spotService: SpotService,
+class HtmlController(val userService: UserService,
                      val httpServletRequest: HttpServletRequest,
                      val authManager: AuthenticationManager) {
 
@@ -58,7 +55,7 @@ class HtmlController(val spotService: SpotService,
     @GetMapping("/list")
     fun list(): Any? {
         val coverUrls = ArrayList<String>()
-        for (tokens in spotService.getTokens()) {
+        for (tokens in userService.getTokens()) {
             var httpHeaders = HttpHeaders()
             httpHeaders.set("Authorization", "Bearer " + tokens.token)
             val httpEntity = HttpEntity("", httpHeaders)
@@ -72,7 +69,7 @@ class HtmlController(val spotService: SpotService,
                 }
             } catch (e: HttpClientErrorException) {
                 if (e.statusCode.value() == 401) {
-                    var httpHeaders = HttpHeaders()
+                    val httpHeaders = HttpHeaders()
                     httpHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED)
                     httpHeaders.setBasicAuth(clientId, clientSecret)
                     val map: MultiValueMap<String, String> = LinkedMultiValueMap()
@@ -86,7 +83,7 @@ class HtmlController(val spotService: SpotService,
                             val refreshed_tokens = tokenRespose.body as RefreshTokenResponse
                             val userName = getMyName(refreshed_tokens.access_token)
                             if (userName != null) {
-                                spotService.registerToken(userName, refreshed_tokens.access_token, tokens.refresh_token)
+                                userService.registerToken(userName, refreshed_tokens.access_token, tokens.refresh_token)
                             }
                         }
                     }
@@ -94,46 +91,51 @@ class HtmlController(val spotService: SpotService,
                 }
             }
         }
-        //coverUrls.add("https://i.scdn.co/image/b99b0f2f799051d4acb1edcab07838ab15442b33")
         return coverUrls
     }
 
     @GetMapping("/sp_callback")
     fun login(@RequestParam("code") code: String, @RequestParam("state") state: String): RedirectView {
-        var httpHeaders = HttpHeaders()
-        httpHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED)
-        httpHeaders.setBasicAuth(clientId, clientSecret)
-        val map: MultiValueMap<String, String> = LinkedMultiValueMap()
-        map.add("code", code)
-        map.add("redirect_uri", callbackUrl)
-        map.add("grant_type", "authorization_code")
-        val request: HttpEntity<MultiValueMap<String, String>> = HttpEntity(map, httpHeaders)
-        val restTemplate = RestTemplate()
-        val tokenRespose = restTemplate.exchange("https://accounts.spotify.com/api/token", HttpMethod.POST, request, TokenResponse::class.java)
-        if (tokenRespose.statusCode.is2xxSuccessful) {
-            if (tokenRespose.body is TokenResponse) {
-                val tokens = tokenRespose.body as TokenResponse
-                val userName = getMyName(tokens.access_token)
-                if (userName != null) {
-                    spotService.registerToken(userName, tokens.access_token, tokens.refresh_token)
-                    this.httpServletRequest.session.setAttribute("spotify_user_id", userName)
-                    val authReq = UsernamePasswordAuthenticationToken(userName, tokens.access_token)
-                    val auth = authManager.authenticate(authReq)
-                    val sc = SecurityContextHolder.getContext()
-                    sc.authentication = auth
-                    httpServletRequest.getSession(true).setAttribute(SPRING_SECURITY_CONTEXT_KEY, sc)
+        if (state.equals(httpServletRequest.session.getAttribute("spotify_auth_state"))) {
+            var httpHeaders = HttpHeaders()
+            httpHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED)
+            httpHeaders.setBasicAuth(clientId, clientSecret)
+            val map: MultiValueMap<String, String> = LinkedMultiValueMap()
+            map.add("code", code)
+            map.add("redirect_uri", callbackUrl)
+            map.add("grant_type", "authorization_code")
+            val request: HttpEntity<MultiValueMap<String, String>> = HttpEntity(map, httpHeaders)
+            val restTemplate = RestTemplate()
+            val tokenRespose = restTemplate.exchange("https://accounts.spotify.com/api/token", HttpMethod.POST, request, TokenResponse::class.java)
+            if (tokenRespose.statusCode.is2xxSuccessful) {
+                if (tokenRespose.body is TokenResponse) {
+                    val tokens = tokenRespose.body as TokenResponse
+                    val userName = getMyName(tokens.access_token)
+                    if (userName != null) {
+                        userService.registerToken(userName, tokens.access_token, tokens.refresh_token)
+                        this.httpServletRequest.session.setAttribute("spotify_user_id", userName)
+                        val authReq = UsernamePasswordAuthenticationToken(userName, tokens.access_token)
+                        val auth = authManager.authenticate(authReq)
+                        val sc = SecurityContextHolder.getContext()
+                        sc.authentication = auth
+                        httpServletRequest.getSession(true).setAttribute(SPRING_SECURITY_CONTEXT_KEY, sc)
+                    }
                 }
             }
+            return RedirectView("/")
+        } else {
+            return RedirectView("/?error=authfail")
         }
-        return RedirectView("/")
     }
 
     @GetMapping("/reg")
     fun redirectWithUsingRedirectPrefix(attributes: RedirectAttributes): RedirectView {
+        val state = UUID.randomUUID().toString()
+        httpServletRequest.session.setAttribute("spotify_auth_state", state)
         attributes.addAttribute("response_type", "code")
         attributes.addAttribute("client_id", clientId)
         attributes.addAttribute("scope", "user-read-private user-read-email user-read-currently-playing user-read-playback-state")
-        attributes.addAttribute("state", "st4te")
+        attributes.addAttribute("state", state)
         attributes.addAttribute("redirect_uri", callbackUrl)
         return RedirectView("https://accounts.spotify.com/authorize")
     }

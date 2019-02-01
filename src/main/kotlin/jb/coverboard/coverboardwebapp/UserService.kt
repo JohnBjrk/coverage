@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service
 import java.io.File
 
 @Service
-class SpotService(val userRepository: UserRepository) {
+class UserService(val userRepository: UserRepository) {
 
     data class TokenDBJSON(val db: Map<String, Tokens>)
 
