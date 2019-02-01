@@ -27,6 +27,7 @@ class HtmlController(val spotService: SpotService) {
 
     val clientId: String = System.getenv("CLIENT_ID")
     val clientSecret: String = System.getenv("CLIENT_SECRET")
+    val callbackUrl: String = System.getenv("CALLBACK_URL")
 
     data class UserInfo(val id: String)
 
@@ -127,7 +128,7 @@ class HtmlController(val spotService: SpotService) {
         httpHeaders.setBasicAuth(clientId, clientSecret)
         val map: MultiValueMap<String, String> = LinkedMultiValueMap()
         map.add("code", code)
-        map.add("redirect_uri", "http://localhost:8080/sp_callback")
+        map.add("redirect_uri", callbackUrl)
         map.add("grant_type", "authorization_code")
         val request: HttpEntity<MultiValueMap<String, String>> = HttpEntity(map, httpHeaders)
         val restTemplate = RestTemplate()
@@ -151,7 +152,7 @@ class HtmlController(val spotService: SpotService) {
         attributes.addAttribute("client_id", clientId)
         attributes.addAttribute("scope", "user-read-private user-read-email user-read-currently-playing user-read-playback-state")
         attributes.addAttribute("state", "st4te")
-        attributes.addAttribute("redirect_uri", "http://localhost:8080/sp_callback")
+        attributes.addAttribute("redirect_uri", callbackUrl)
         return RedirectView("https://accounts.spotify.com/authorize")
     }
 
