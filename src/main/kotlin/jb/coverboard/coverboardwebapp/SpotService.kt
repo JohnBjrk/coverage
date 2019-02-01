@@ -2,6 +2,7 @@ package jb.coverboard.coverboardwebapp
 
 import com.google.gson.Gson
 import org.springframework.context.annotation.Bean
+import org.springframework.scheduling.annotation.Scheduled
 //import org.springframework.security.oauth2.client.OAuth2ClientContext
 //import org.springframework.security.oauth2.client.OAuth2RestTemplate
 //import org.springframework.security.oauth2.client.resource.OAuth2ProtectedResourceDetails
@@ -34,5 +35,10 @@ class SpotService(val userRepository: UserRepository) {
         return userRepository.findAll().map { Tokens(it.accessToken, it.refreshToken) }
 
         //return tokenDB.values.toTypedArray()
+    }
+
+    @Scheduled(fixedDelay = 5000)
+    fun updateCurrentPlaying() {
+        println("Update currently playing")
     }
 }

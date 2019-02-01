@@ -4,11 +4,15 @@ import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
 import org.springframework.http.MediaType
+import org.springframework.security.authentication.AuthenticationManager
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RestController
 import java.security.Principal
 import org.springframework.security.oauth2.provider.OAuth2Authentication
 import org.springframework.security.oauth2.provider.authentication.OAuth2AuthenticationDetails
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY
 import org.springframework.stereotype.Component
 import org.springframework.util.ErrorHandler
 import org.springframework.web.client.RestTemplate
@@ -19,11 +23,14 @@ import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.client.HttpClientErrorException
 import org.springframework.web.servlet.mvc.support.RedirectAttributes
 import org.springframework.web.servlet.view.RedirectView
+import javax.servlet.http.HttpServletRequest
 
 
 @Component
 @RestController
-class HtmlController(val spotService: SpotService) {
+class HtmlController(val spotService: SpotService,
+                     val httpServletRequest: HttpServletRequest,
+                     val authManager: AuthenticationManager) {
 
     val clientId: String = System.getenv("CLIENT_ID")
     val clientSecret: String = System.getenv("CLIENT_SECRET")
@@ -42,38 +49,10 @@ class HtmlController(val spotService: SpotService) {
     data class RefreshTokenResponse(val access_token: String, val token_type: String, val scope: String,
                              val expires_in: Int)
 
-//    @GetMapping("/user")
-//    fun user(principal: Principal): Principal {
-//        return principal
-//    }
-//
-//    @GetMapping("/u")
-//    fun u(principal: Principal): Any {
-//        return when (principal) {
-//            is OAuth2Authentication ->
-//                when (principal.details) {
-//                    is OAuth2AuthenticationDetails -> (principal.details as OAuth2AuthenticationDetails).tokenValue
-//                    else -> principal.details.toString()
-//                }
-//            else -> principal.name
-//        }
-//    }
-
-//    @GetMapping("/reg")
-//    fun reg(principal: Principal): Any? {
-//        return when (principal) {
-//            is OAuth2Authentication ->
-//                when (principal.details) {
-//                    is OAuth2AuthenticationDetails -> {
-//                        val tok = (principal.details as OAuth2AuthenticationDetails).tokenValue
-//                        spotService.registerToken(principal.name, tok)
-//                        spotService.store()
-//                    }
-//                    else -> "Err"
-//                }
-//            else -> "Err"
-//        }
-//    }
+    @GetMapping("/test")
+    fun test(): String {
+        return "test"
+    }
 
     @CrossOrigin
     @GetMapping("/list")
@@ -137,6 +116,12 @@ class HtmlController(val spotService: SpotService) {
                 val userName = getMyName(tokens.access_token)
                 if (userName != null) {
                     spotService.registerToken(userName, tokens.access_token, tokens.refresh_token)
+                    this.httpServletRequest.session.setAttribute("spotify_user_id", userName)
+                    val authReq = UsernamePasswordAuthenticationToken(userName, tokens.access_token)
+                    val auth = authManager.authenticate(authReq)
+                    val sc = SecurityContextHolder.getContext()
+                    sc.authentication = auth
+                    httpServletRequest.getSession(true).setAttribute(SPRING_SECURITY_CONTEXT_KEY, sc)
                 }
             }
         }
