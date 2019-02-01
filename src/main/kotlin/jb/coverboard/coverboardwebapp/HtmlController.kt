@@ -78,7 +78,6 @@ class HtmlController(val spotService: SpotService) {
     @CrossOrigin
     @GetMapping("/list")
     fun list(): Any? {
-        spotService.restore()
         val coverUrls = ArrayList<String>()
         for (tokens in spotService.getTokens()) {
             var httpHeaders = HttpHeaders()
@@ -109,7 +108,6 @@ class HtmlController(val spotService: SpotService) {
                             val userName = getMyName(refreshed_tokens.access_token)
                             if (userName != null) {
                                 spotService.registerToken(userName, refreshed_tokens.access_token, tokens.refresh_token)
-                                spotService.store()
                             }
                         }
                     }
@@ -139,7 +137,6 @@ class HtmlController(val spotService: SpotService) {
                 val userName = getMyName(tokens.access_token)
                 if (userName != null) {
                     spotService.registerToken(userName, tokens.access_token, tokens.refresh_token)
-                    spotService.store()
                 }
             }
         }

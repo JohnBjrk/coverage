@@ -35,18 +35,4 @@ class SpotService(val userRepository: UserRepository) {
 
         //return tokenDB.values.toTypedArray()
     }
-
-    fun store() {
-        val gson = Gson()
-        val jsonDb = gson.toJson(TokenDBJSON(tokenDB))
-        File("tokenDB").writeText(jsonDb)
-    }
-
-    fun restore() {
-        val gson = Gson()
-        if (tokenDB.isEmpty()) {
-            val jsonString = File("tokenDB").readText()
-            tokenDB = gson.fromJson(jsonString, TokenDBJSON::class.java).db.toMutableMap()
-        }
-    }
 }
