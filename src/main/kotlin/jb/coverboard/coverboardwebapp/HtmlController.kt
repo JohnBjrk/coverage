@@ -42,22 +42,22 @@ class HtmlController(val spotService: SpotService) {
     data class RefreshTokenResponse(val access_token: String, val token_type: String, val scope: String,
                              val expires_in: Int)
 
-    @GetMapping("/user")
-    fun user(principal: Principal): Principal {
-        return principal
-    }
-
-    @GetMapping("/u")
-    fun u(principal: Principal): Any {
-        return when (principal) {
-            is OAuth2Authentication ->
-                when (principal.details) {
-                    is OAuth2AuthenticationDetails -> (principal.details as OAuth2AuthenticationDetails).tokenValue
-                    else -> principal.details.toString()
-                }
-            else -> principal.name
-        }
-    }
+//    @GetMapping("/user")
+//    fun user(principal: Principal): Principal {
+//        return principal
+//    }
+//
+//    @GetMapping("/u")
+//    fun u(principal: Principal): Any {
+//        return when (principal) {
+//            is OAuth2Authentication ->
+//                when (principal.details) {
+//                    is OAuth2AuthenticationDetails -> (principal.details as OAuth2AuthenticationDetails).tokenValue
+//                    else -> principal.details.toString()
+//                }
+//            else -> principal.name
+//        }
+//    }
 
 //    @GetMapping("/reg")
 //    fun reg(principal: Principal): Any? {
