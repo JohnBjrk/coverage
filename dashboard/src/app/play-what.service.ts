@@ -13,6 +13,6 @@ export class PlayWhatService {
 
   getImages(): Observable<string[]> {
     // return this.images
-    return this.http.get<string[]>("http://localhost:8080/list");
+    return this.http.get<string[]>("/list");
   }
 }
