@@ -32,7 +32,12 @@ class UserService(val userRepository: UserRepository) {
     }
 
     fun getTokens(): List<Tokens> {
-        return userRepository.findAll().map { Tokens(it.accessToken, it.refreshToken) }
+        println("Getting registered users")
+        val users = userRepository.findAll()
+        for (user in users) {
+            println("User: " + user.userId)
+        }
+        return users.map { Tokens(it.accessToken, it.refreshToken) }
 
         //return tokenDB.values.toTypedArray()
     }
