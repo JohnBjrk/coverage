@@ -41,9 +41,4 @@ class UserService(val userRepository: UserRepository) {
 
         //return tokenDB.values.toTypedArray()
     }
-
-    @Scheduled(fixedDelay = 5000)
-    fun updateCurrentPlaying() {
-        println("Update currently playing")
-    }
 }
