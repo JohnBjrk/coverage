@@ -38,7 +38,7 @@ class HtmlController(val userService: UserService,
     data class Image(val url: String)
     data class Album(val images: Array<Image>)
     data class Item(val album: Album)
-    data class Playing(val item: Item)
+    data class Playing(val is_playing: Boolean, val item: Item)
 
     data class TokenResponse(val access_token: String, val token_type: String, val scope: String,
                              val expires_in: Int, val refresh_token: String)
@@ -64,7 +64,10 @@ class HtmlController(val userService: UserService,
                 val playing = restTemplate.exchange("https://api.spotify.com/v1/me/player/currently-playing", HttpMethod.GET, httpEntity, Playing::class.java)
                 if (playing.statusCode.is2xxSuccessful) {
                     if (playing.body != null && playing.body is Playing) {
-                        coverUrls.add((playing.body as Playing).item.album.images[0].url)
+                        val p = playing.body as Playing
+                        if (p.is_playing) {
+                            coverUrls.add(p.item.album.images[0].url)
+                        }
                     }
                 }
             } catch (e: HttpClientErrorException) {
