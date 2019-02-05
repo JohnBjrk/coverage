@@ -90,7 +90,7 @@ class HtmlController(val userService: UserService,
                     }
                 }
             }
-            return RedirectView("/")
+            return RedirectView("/?loggedin=yes")
         } else {
             return RedirectView("/?error=authfail")
         }

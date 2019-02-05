@@ -33,9 +33,12 @@ class AppConfig(val requestLogger: RequestLogger, val customAuthProvider: Custom
                 .antMatcher("/**").cors()
                 .and()
                 .authorizeRequests()
-                    .antMatchers("/reg").permitAll()
-                    .antMatchers("/sp_callback").permitAll()
-                    .anyRequest().authenticated()
+                .antMatchers("/*.js").permitAll()
+                .antMatchers("/*.css").permitAll()
+                .antMatchers("/").permitAll()
+                .antMatchers("/reg").permitAll()
+                .antMatchers("/sp_callback").permitAll()
+                .anyRequest().authenticated()
         //super.configure(http)
     }
 
