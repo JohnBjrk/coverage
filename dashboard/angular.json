@@ -20,12 +20,22 @@
             "tsConfig": "src/tsconfig.app.json",
             "assets": [
               "src/favicon.ico",
-              "src/assets"
+              "src/assets","src/vendor/jquery/jquery.min.map",
+              "src/vendor/jquery/jquery.slim.min.map"
             ],
             "styles": [
-              "src/styles.css"
+              "src/styles.css",
+              "src/css/thumbnail-gallery.css",
+              "src/vendor/bootstrap/css/bootstrap.css",
+              "src/vendor/bootstrap/css/bootstrap-grid.css",
+              "src/vendor/bootstrap/css/bootstrap-reboot.css"
             ],
-            "scripts": []
+            "scripts": [
+              "src/vendor/bootstrap/js/bootstrap.js",
+              "src/vendor/bootstrap/js/bootstrap.bundle.js",
+              "src/vendor/jquery/jquery.js",
+              "src/vendor/jquery/jquery.slim.js"
+            ]
           },
           "configurations": {
             "production": {

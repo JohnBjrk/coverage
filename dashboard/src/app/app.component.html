@@ -1,5 +1,23 @@
 <!--The content below is only a placeholder and can be replaced.-->
 <div>
-  <img *ngFor="let image of images" class="rounded" width="400" src="{{image}}" />
+
+  <div class="container">
+
+    <div class="my-4 text-center text-lg-left"></div>
+    <a *ngIf="!loggedin" href="/reg">Log In</a>
+    <a href="/reg">Log In</a>
+
+    <div class="row text-center text-lg-left">
+
+      <div *ngFor="let image of images" class="col-lg-3 col-md-4 col-xs-6">
+        <a href="#" class="d-block mb-4 h-100">
+          <img class="img-fluid img-thumbnail" src="{{image}}" alt="">
+        </a>
+      </div>
+
+    </div>
+
+  </div>
+
 </div>
 

@@ -29,10 +29,6 @@ class AppConfig(val requestLogger: RequestLogger, val customAuthProvider: Custom
     }
 
     override fun configure(http: HttpSecurity) {
-//        http.antMatcher("/test").anonymous()
-//        http.antMatcher("/reg").anonymous()
-//        http.antMatcher("/**").authorizeRequests().anyRequest().authenticated()
-//        http.antMatcher("/**").cors()
         http
                 .antMatcher("/**").cors()
                 .and()
