@@ -1,7 +1,7 @@
 spring:
-  #jpa:
+  jpa:
     #database: H2
-    #properties:
-      #hibernate.dialect: org.hibernate.dialect.PostgreSQLDialect
+    properties:
+      hibernate.dialect: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       ddl-auto: update
