@@ -31,10 +31,11 @@
               "src/vendor/bootstrap/css/bootstrap-reboot.css"
             ],
             "scripts": [
-              "src/vendor/bootstrap/js/bootstrap.js",
-              "src/vendor/bootstrap/js/bootstrap.bundle.js",
               "src/vendor/jquery/jquery.js",
-              "src/vendor/jquery/jquery.slim.js"
+              "src/vendor/jquery/jquery.slim.js",
+              "src/vendor/bootstrap/js/bootstrap.js",
+              "src/vendor/bootstrap/js/bootstrap.bundle.js"
+
             ]
           },
           "configurations": {
