@@ -6,5 +6,5 @@ spring:
     hibernate:
       ddl-auto: update
   redis:
-    host: ${REDIS_URL}
+    url: ${REDIS_URL}
     #port: 6379
