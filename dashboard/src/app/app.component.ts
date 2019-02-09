@@ -24,13 +24,13 @@ export class AppComponent implements OnInit {
     this.route.queryParamMap.subscribe(queryParams => {
       this.loggedin = queryParams.get("loggedin") == "yes";
       if (this.loggedin && !this.polling) {
-        interval(5000)
+        interval(1000)
           .pipe(
             startWith(0),
             switchMap(() => this.playWhatService.getImages())
           )
           //.subscribe(images => this.images = [images[0], images[0], images[0], images[0], images[0], images[0], images[0], images[0], images[0], images[0], images[0], images[0], images[0], images[0]]);
-          .subscribe(images => this.images = images);
+          .subscribe(images => this.images = images, error => console.log("Could not get album list"));
         this.polling = true;
       }
     })

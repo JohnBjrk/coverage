@@ -49,6 +49,7 @@ class SpotifyService(val userService: UserService) {
         val restTemplate = RestTemplate()
         try {
             val playing = restTemplate.exchange("https://api.spotify.com/v1/me/player/currently-playing", HttpMethod.GET, httpEntity, CurrentlyPlayingResult.Playing::class.java)
+            //println("Got resp: " + playing.statusCodeValue)
             if (playing.statusCode.is2xxSuccessful) {
                 if (playing.body != null && playing.body is CurrentlyPlayingResult.Playing) {
                     val p = playing.body as CurrentlyPlayingResult.Playing
