@@ -15,16 +15,19 @@ import java.util.ArrayList
 @Service
 class SpotifyService(val userService: UserService) {
 
+    data class PlayingData(val imageUrl: String, val spotifyUrl: String)
+
     var hasCurrentlyPlayingRequest: Boolean = false
 
-    var globalCoverUrls = emptyList<String>()
+    var globalPlayingData = emptyList<PlayingData>()
 
     val clientId: String = System.getenv("CLIENT_ID")
     val clientSecret: String = System.getenv("CLIENT_SECRET")
 
     data class Image(val url: String)
     data class Album(val images: Array<Image>)
-    data class Item(val album: Album)
+    data class ExternalUrls(val spotify: String)
+    data class Item(val album: Album, val external_urls: ExternalUrls)
 
     sealed class CurrentlyPlayingResult {
         data class Playing(val is_playing: Boolean, val item: Item) : CurrentlyPlayingResult()
@@ -37,9 +40,16 @@ class SpotifyService(val userService: UserService) {
 
     data class UserInfo(val id: String)
 
-    fun getCoverUrls(): List<String> {
+    fun requestDataRefresh() {
         hasCurrentlyPlayingRequest = true
-        return globalCoverUrls
+    }
+
+    fun getCoverUrls(): List<String> {
+        return globalPlayingData.map { it.imageUrl }
+    }
+
+    fun getPlayingData(): List<PlayingData> {
+        return globalPlayingData
     }
 
     fun getCurrentlyPlaying(accessToken: String): CurrentlyPlayingResult {
@@ -107,7 +117,7 @@ class SpotifyService(val userService: UserService) {
 
     @Scheduled(fixedDelay = 5000)
     fun updateCurrentPlaying() {
-        val coverUrls = ArrayList<String>()
+        val playingDataList = ArrayList<PlayingData>()
         if (hasCurrentlyPlayingRequest) {
             println("Update currently playing")
             for (tokens in userService.getTokens()) {
@@ -115,7 +125,9 @@ class SpotifyService(val userService: UserService) {
                 when (currentlyPlayingResult) {
                     is SpotifyService.CurrentlyPlayingResult.Playing -> {
                         if (currentlyPlayingResult.is_playing) {
-                            coverUrls.add(currentlyPlayingResult.item.album.images[0].url)
+                            val playingData = PlayingData(currentlyPlayingResult.item.album.images[0].url,
+                                    currentlyPlayingResult.item.external_urls.spotify)
+                            playingDataList.add(playingData)
                         }
                     }
                     is SpotifyService.CurrentlyPlayingResult.NeedsRefresh -> {
@@ -125,6 +137,6 @@ class SpotifyService(val userService: UserService) {
             }
             hasCurrentlyPlayingRequest = false
         }
-        globalCoverUrls = coverUrls
+        globalPlayingData = playingDataList
     }
 }

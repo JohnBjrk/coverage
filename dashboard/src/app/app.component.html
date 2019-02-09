@@ -29,9 +29,9 @@
 
     <div class="row text-center text-lg-left">
 
-      <div *ngFor="let image of images" class="col-lg-3 col-md-4 col-xs-6">
-        <a href="#" class="d-block mb-4 h-100">
-          <img class="img-fluid img-thumbnail" src="{{image}}" alt="">
+      <div *ngFor="let playingData of playingDataList" class="col-lg-3 col-md-4 col-xs-6">
+        <a href="{{playingData.spotifyUrl}}" class="d-block mb-4 h-100" target="_blank">
+          <img class="img-fluid img-thumbnail" src="{{playingData.imageUrl}}" alt="">
         </a>
       </div>
 

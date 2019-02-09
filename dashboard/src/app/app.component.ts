@@ -3,6 +3,7 @@ import { PlayWhatService } from "./play-what.service";
 import { interval } from "rxjs";
 import { startWith, switchMap } from "rxjs/operators";
 import { ActivatedRoute } from "@angular/router";
+import { PlayingData } from "./data.model";
 
 @Component({
   selector: 'app-root',
@@ -14,7 +15,7 @@ export class AppComponent implements OnInit {
 
   loggedin: boolean = false;
   polling: boolean = false;
-  images = Array<string>();
+  playingDataList = Array<PlayingData>();
 
   constructor(private playWhatService: PlayWhatService, private route: ActivatedRoute) {
 
@@ -27,10 +28,8 @@ export class AppComponent implements OnInit {
         interval(1000)
           .pipe(
             startWith(0),
-            switchMap(() => this.playWhatService.getImages())
-          )
-          //.subscribe(images => this.images = [images[0], images[0], images[0], images[0], images[0], images[0], images[0], images[0], images[0], images[0], images[0], images[0], images[0], images[0]]);
-          .subscribe(images => this.images = images, error => console.log("Could not get album list"));
+            switchMap(() => this.playWhatService.getPlayingData())
+          ).subscribe(listV2DTO => this.playingDataList = listV2DTO.playing_data_list);
         this.polling = true;
       }
     })

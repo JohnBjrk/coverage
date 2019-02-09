@@ -36,6 +36,8 @@ class HtmlController(val userService: UserService,
     data class TokenResponse(val access_token: String, val token_type: String, val scope: String,
                              val expires_in: Int, val refresh_token: String)
 
+    data class ListV2DTO(val playing_data_list: List<SpotifyService.PlayingData>)
+
     @GetMapping("/test")
     fun test(): String {
         return "test"
@@ -44,22 +46,15 @@ class HtmlController(val userService: UserService,
     @CrossOrigin
     @GetMapping("/list")
     fun list(): Any? {
+        spotifyService.requestDataRefresh()
         return spotifyService.getCoverUrls()
-//        val coverUrls = ArrayList<String>()
-//        for (tokens in userService.getTokens()) {
-//            val currentlyPlayingResult = spotifyService.getCurrentlyPlaying(tokens.token)
-//            when (currentlyPlayingResult) {
-//                is SpotifyService.CurrentlyPlayingResult.Playing -> {
-//                    if (currentlyPlayingResult.is_playing) {
-//                        coverUrls.add(currentlyPlayingResult.item.album.images[0].url)
-//                    }
-//                }
-//                is SpotifyService.CurrentlyPlayingResult.NeedsRefresh -> {
-//                    spotifyService.refreshAccessToken(tokens.refresh_token)
-//                }
-//            }
-//        }
-//        return coverUrls
+    }
+
+    @CrossOrigin
+    @GetMapping("/list_v2")
+    fun list_v2(): ListV2DTO {
+        spotifyService.requestDataRefresh()
+        return ListV2DTO(spotifyService.getPlayingData())
     }
 
     @GetMapping("/sp_callback")
