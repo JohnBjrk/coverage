@@ -10,6 +10,9 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry
 import org.springframework.web.servlet.config.annotation.CorsRegistry
+import org.springframework.session.data.redis.config.ConfigureRedisAction
+
+
 
 
 @Configuration
@@ -45,5 +48,10 @@ class AppConfig(val requestLogger: RequestLogger, val customAuthProvider: Custom
     @Bean
     override fun authenticationManagerBean(): AuthenticationManager {
         return super.authenticationManagerBean()
+    }
+
+    @Bean
+    fun configureRedisAction(): ConfigureRedisAction {
+        return ConfigureRedisAction.NO_OP
     }
 }
